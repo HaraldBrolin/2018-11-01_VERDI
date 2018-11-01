@@ -1,0 +1,74 @@
+---
+title: "Create manifest"
+output:
+  html_document:
+    df_print: paged
+---
+```{r}
+library("tidyverse")
+library("knitr")
+library("here")
+```
+
+To import demultiplexed paired-end reads into Qiime2, first we need to create a manifest to link toghter the metadata with the Illumina samples. More infor can be found here [Qiime2 import tutorial] (https://docs.qiime2.org/2018.8/tutorials/importing/), see “Fastq manifest”.
+
+The final format should look like this.
+
+```{r eval=FALSE, include=TRUE}
+
+sample-id,absolute-filepath,direction
+sample-1,$PWD/some/filepath/sample1_R1.fastq,forward
+sample-1,$PWD/some/filepath/sample1_R2.fastq,reverse
+```
+
+We have four type of fastq-names:
+
+801316623959_S44_L001_R1_001.fastq.gz
+verdi-1-171109_S110_L001_R1_001.fastq.gz
+Mock-2_S114_L001_R1_001.fastq.gz
+Undetermined_S0_L001_R1_001.fastq.gz
+
+**The following code is not general, this is specific to the VERDI project sample naming**
+
+```{r echo=TRUE}
+# Createa a dataframe based on 
+create_data_frame <- function(regex_pattern){
+  list_of_files <- 
+      list.files(path = "../../../../data/raw/", pattern = regex_pattern )
+  df <- 
+    data.frame(
+      sample_id = list_of_files %>% as.character(),
+      absolute_filepath = paste("$PWD/../../data/raw/", list_of_files, sep = ""),
+      direction = sapply(list_of_files, direction),
+      stringsAsFactors = FALSE,
+      row.names = 1:(list_of_files %>% length())) 
+}
+
+# Get the direction dependet on _R1_ or __R2__
+direction <- function(x){
+  ifelse(grepl(pattern = "_R1_", x), "forward", "reverse")
+}
+
+names_df <- create_data_frame("(^[0-9]{4})")
+names_df$sample_id <- sapply(names_df$sample_id, substr, 5, 12)
+
+verdi_df <- create_data_frame("(verdi)")
+verdi_df$sample_id <- sapply(strsplit(verdi_df$sample_id, "_"), "[", 1)
+
+mock_df <- create_data_frame("(Mock)")
+mock_df$sample_id <- sapply(strsplit(mock_df$sample_id, "-"), "[", 1)
+
+undetermined_df <- create_data_frame("(Undetermined)")
+undetermined_df$sample_id <- sapply(strsplit(undetermined_df$sample_id, "_"), "[", 1)
+
+samples_df <- rbind(names_df, verdi_df, mock_df, undetermined_df)
+kable(samples_df[c(1:3, 225:230),], align = "l", format = "html")
+
+write.table(samples_df,
+          file = "../../../verdi_snakemake/manifest_file",
+          quote = FALSE,
+          sep = ",",
+          row.names = FALSE,
+          col.names = FALSE)
+```
+

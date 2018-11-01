@@ -1,0 +1,13 @@
+sample-id,absolute-filepath,direction
+16586412,$PWD/../../../data/raw/801316586412_S36_L001_R1_001.fastq.gz,forward
+16586412,$PWD/../../../data/raw/801316586412_S36_L001_R2_001.fastq.gz,reverse
+16586630,$PWD/../../../data/raw/801316586630_S49_L001_R1_001.fastq.gz,forward
+16586630,$PWD/../../../data/raw/801316586630_S49_L001_R2_001.fastq.gz,reverse
+16623640,$PWD/../../../data/raw/801316623640_S38_L001_R1_001.fastq.gz,forward
+16623640,$PWD/../../../data/raw/801316623640_S38_L001_R2_001.fastq.gz,reverse
+16623692,$PWD/../../../data/raw/801316623692_S9_L001_R1_001.fastq.gz,forward
+16623692,$PWD/../../../data/raw/801316623692_S9_L001_R2_001.fastq.gz,reverse
+16623959,$PWD/../../../data/raw/801316623959_S44_L001_R1_001.fastq.gz,forward
+16623959,$PWD/../../../data/raw/801316623959_S44_L001_R2_001.fastq.gz,reverse
+Mock,$PWD/../../../data/raw/Mock-2_S114_L001_R1_001.fastq.gz,forward
+Mock,$PWD/../../../data/raw/Mock-2_S114_L001_R2_001.fastq.gz,reverse
