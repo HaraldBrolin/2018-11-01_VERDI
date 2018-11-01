@@ -5,13 +5,19 @@ files = os.listdir("../../../data/raw/")
 mock_files = []
 sample_files = []
 
-for (i,file) in enumerate(files):
+for file in files:
     if re.search("Mock", file):
         mock_files.append(file)
     elif re.search(".gitkeep", file):
         pass
+    elif re.search("Undetermined", file):
+        pass
+    elif re.search("verdi", file):
+        pass
     else:
         sample_files.append(file)
+
+
 
 print("sample-id,absolute-filepath,direction")
 for file in sample_files:
