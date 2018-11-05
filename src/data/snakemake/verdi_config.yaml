@@ -34,8 +34,8 @@ metadata: "../../../data/metadata/metadata.tsv"
 
 # The same settings exist for reverse reads, trunc-len-r and trim-left-r
 
-trunc-len-f: 248
-trunc-len-r: 60
+trunc-len-f: 236
+trunc-len-r: 136
 
 trim-left-f: 0
 trim-left-r: 0

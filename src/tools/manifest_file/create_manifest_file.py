@@ -4,6 +4,7 @@ import re
 files = os.listdir("../../../data/raw/")
 mock_files = []
 sample_files = []
+verdi_files = []
 
 for file in files:
     if re.search("Mock", file):
@@ -13,7 +14,7 @@ for file in files:
     elif re.search("Undetermined", file):
         pass
     elif re.search("verdi", file):
-        pass
+        verdi_files.append(file)
     else:
         sample_files.append(file)
 
@@ -33,3 +34,10 @@ for file in mock_files:
     else:
         direction = "reverse"
     print(file[0:4] + "," + "$PWD/../../../data/raw/" + file + "," + direction)
+
+for file in verdi_files:
+    if re.search("_R1_", file):
+        direction = "forward"
+    else:
+        direction = "reverse"
+    print(file[0:8] + "," + "$PWD/../../../data/raw/" + file + "," + direction)

@@ -18,6 +18,14 @@ rule all:
         "../../../data/visualizations/import/quality_profiles.qzv"
 
 
+rule create_manifest:
+    input:
+        "../../tools/manifest_file/create_manifest_file.py"
+    output:
+        "../../../data/metadata/manifest_file"
+    run:
+        shell("python {input} > {output}")
+
 # This rule imports the paired-end samples based on a manifest file, see input.
 # Since we are impporting paired end each sample needs to have two sampels
 # R1 and R2, forward and reverseself. A manifest file is also required specifying
@@ -33,9 +41,9 @@ rule all:
 
 rule paired_end_import:
     input:
-        "../../../data/metadata/manifest_file"
+        rules.create_manifest.output
     output:
-        "../../../data/interim/artifacts/paired_end_demux.qza"
+        "../../../data/interim/artifacts/import/paired_end_demux.qza"
     run:
         shell(
             "qiime tools import"
