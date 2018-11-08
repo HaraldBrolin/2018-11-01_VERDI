@@ -1,0 +1,124 @@
+---
+title: "Beta diversity"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(dada2)
+library(phyloseq)
+library(Biostrings)
+library(here)
+library(gridExtra)
+```
+
+
+```{r load data and calculate ordination,  message=FALSE, warning=FALSE}
+set.seed(2018)
+df <- readRDS(file = here("physeq.rds"))
+
+u_unifrac <- ordinate(df, "PCoA", "unifrac", weighted = FALSE)
+w_unifrac <- ordinate(df, "PCoA", "unifrac", weighted = TRUE)
+bray <- ordinate(df, "PCoA", "bray")
+
+theme_set(theme_bw())
+```
+
+
+```{r u-unif, echo=TRUE}
+p1 <- ggplot(u_unifrac$vectors[,1:2] %>%
+               as.data.frame() %>%
+               cbind(df@sam_data$patient,  df@sam_data$fs),
+             aes(x =  Axis.1, y = Axis.2)) +
+  geom_text(aes(label = df@sam_data$patient)) +
+  xlab(paste("Axis 1:", u_unifrac$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", u_unifrac$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+p2 <- 
+  ggplot(u_unifrac$vectors[,1:2] %>%
+           as.data.frame() %>%
+           cbind(df@sam_data$patient,  df@sam_data$fs),
+         aes(x =  Axis.1, y = Axis.2)) +
+  geom_point(aes(color = df@sam_data$fs)) +
+  geom_line(alpha = 0.3, aes(group = df@sam_data$patient)) +
+  theme(legend.title = element_blank()) +
+  xlab(paste("Axis 1:", u_unifrac$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", u_unifrac$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+```
+
+### Unweighted UniFrac
+
+First we'll take a look at the qualitative and phylogeneti measurment: unweighted UniFrac.
+```{r u-unifrac, echo=FALSE, fig.height=7, fig.width=14}
+grid.arrange(p1, p2, widths = c(1, 1.2), ncol = 2)
+```
+*The numbers indicate the patient ID, the colors indicate the diet type and the lines connecting the dots between the same patient*.
+
+Looking at a qualitative phylogenetic measurment we have a 12.4% resp 9.6% percent variation captured. It seems like the patient has a larger effect on the clustering than the diet. The result also suggest that we have patients with a relativley stable- and patients with a variable microbiota, it would be interesting to do further analysis and see if this is the case.  
+
+
+
+### Bray-Curtis distance
+
+Bray-Curtis a quantitative measurment, taking into an account the different ASVs and thier abundance.
+```{r bray, echo=FALSE, fig.height= 7, fig.width= 14}
+p1 <- ggplot(bray$vectors[,1:2] %>%
+               as.data.frame() %>%
+               cbind(df@sam_data$patient,  df@sam_data$fs),
+             aes(x =  Axis.1, y = Axis.2)) +
+  geom_text(aes(label = df@sam_data$patient)) +
+  xlab(paste("Axis 1:", bray$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", bray$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+p2 <- ggplot(bray$vectors[,1:2] %>%
+               as.data.frame() %>%
+               cbind(df@sam_data$patient,  df@sam_data$fs),
+             aes(x =  Axis.1, y = Axis.2)) +
+  geom_point(aes(color = df@sam_data$fs)) +
+  geom_line(alpha = 0.3, aes(group = df@sam_data$patient)) +
+  theme(legend.title = element_blank()) +
+  xlab(paste("Axis 1:", bray$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", bray$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+grid.arrange(p1, p2, widths = c(1, 1.2), ncol = 2)
+```
+*The numbers indicate the patient ID, the colors indicate the diet type and the lines connecting the dots between the same patient*.
+
+Looking at a quantitavie measurment we have a 8.8% resp 7% percent variation captured. Here the difference betwwen the samples for each patient does not seem to exhibit the same closeness and variation as in the plot un-weighted UniFrac (the close samples have separated and the samples far-away have come closer). Looking at samples for patient 30, 28 and 5 all which have a large distance between the dots in the **un-weighted unifrac**-plot, does not show the same large distance in the Bray-curtis plot; one migth even say that they seem closer togheter than the average patient-samples (atleast 30 amd 28). It would be interesting to see why this is the case, by investigating the samples looking at taxonomic bar-plots. 
+
+
+
+### Weighted-UniFrac distance
+
+Weighted-UniFrac distance is quantitative measurment that accounts for phylogenetic distance aswell.
+```{r weigthed unifrac, echo=FALSE, fig.height= 7, fig.width= 14}
+p1 <- ggplot(w_unifrac$vectors[,1:2] %>%
+               as.data.frame() %>%
+               cbind(df@sam_data$patient,  df@sam_data$fs),
+             aes(x =  Axis.1, y = Axis.2)) +
+  geom_text(aes(label = df@sam_data$patient)) +
+  xlab(paste("Axis 1:", w_unifrac$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", w_unifrac$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+p2 <- ggplot(w_unifrac$vectors[,1:2] %>%
+               as.data.frame() %>%
+               cbind(df@sam_data$patient,  df@sam_data$fs),
+             aes(x =  Axis.1, y = Axis.2)) +
+  geom_point(aes(color = df@sam_data$fs)) +
+  geom_line(alpha = 0.3, aes(group = df@sam_data$patient)) +
+  theme(legend.title = element_blank()) +
+  xlab(paste("Axis 1:", w_unifrac$values$Relative_eig[1] %>% round(., digits = 4), sep = " ")) +
+  ylab(paste("Axis 2:", w_unifrac$values$Relative_eig[2] %>% round(., digits = 4), sep = " ")) 
+
+grid.arrange(p1, p2, widths = c(1, 1.2), ncol = 2)
+```
+*The numbers indicate the patient ID, the colors indicate the diet type and the lines connecting the dots between the same patient*.
+
+Looking at the Un-weigthed UniFracwe have a 28.1% resp 16.7% percent variation captured, since this measurment takes into ancount both what bacteria, the abundence and the phylogenetic distance this is expected to be higher than the previous ones. It is still not the case that the samples cluster based on the diet but rather on the patient, or some other unknown factor. The dots are more closely toghethe, the degree of separation can be tested for but I don't think it would be interesting to test. Here the difference betwwen the samples for each patient are more simlar to the un-weighted UniFrac, patient 30 28 and 5 does have a large distance inbetween them, although several other patients exhibits the same within variation. 
+
+## Conclusion:
+
+Looking at the different ordiantion methods it seems like we have a stronger clustering based on patient rather than on diet, it would be interesting **looking at the variation within patient vs variation within diet**. It would also be intersting to **look at patients with "unstable" microbiota and investigate what changes and how this relates to the clinical measurments**. 

@@ -6,6 +6,7 @@
 /src/data/r-scripts/packrat/*
 
 # r files
+*.Rprofile
 *.Rhistory
 *.rds
 *.RData
