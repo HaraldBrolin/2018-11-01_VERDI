@@ -9,6 +9,7 @@
 *.Rhistory
 *.rds
 *.RData
+*.html
 
 #Snakemake 
 **/.snakemake/
