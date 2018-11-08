@@ -1,5 +1,5 @@
 
-with open("../../../data/processed/reference_sequenceces/sequences.fasta") as f:
+with open("../../../data/processed/reference_sequences/sequences.fasta") as f:
     lines = f.readlines()
 
 md5sum = []

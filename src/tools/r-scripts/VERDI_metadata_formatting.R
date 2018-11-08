@@ -20,29 +20,41 @@ joint_df$p_id <- # remove space and - for each element
 
 names(joint_df)[1:2] <- c("SampleID", "patient") 
 
+# ---------------------- Change the correct names
 
-# test_samples <- c("16586371","16586412","16586630",
-#                  "16623640","16623692","16623959")
+joint_df$SampleID[which(joint_df$SampleID == "verdi1171109")] <- "verdi-1-"
+joint_df$SampleID[which(joint_df$SampleID == "verdi3171108")] <- "verdi-3-"
+joint_df$SampleID[which(joint_df$SampleID == "verdi6171108")] <- "verdi-6-"
+joint_df$SampleID[which(joint_df$SampleID == "verdi8171108")] <- "verdi-8-"
+joint_df$SampleID[which(joint_df$SampleID == "verdi11171108")] <- "verdi-11"
+joint_df$SampleID[which(joint_df$SampleID == "16415940")] <- "16423996"
 
-# joint_df <- joint_df %>% filter(SampleID %in% test_samples)
-
-add_rows <- joint_df[1:7,]
-
-add_rows$SampleID <- c("16423996", "Mock", "verdi-6-", "verdi-1-",
-                       "verdi-3-", "verdi-11-","verdi-8-" )
-
-add_rows$patient[1] <- "40"
-add_rows$patient[2] <- "41"; add_rows$patient[3] <- "42"
-add_rows$patient[4] <- "42"; add_rows$patient[5] <- "42"
-add_rows$patient[6] <- "42"; add_rows$patient[7] <- "42"
-
-
-# Add the mock row, impute values 
+# ------------------------- Add the mock sample
+add_rows <- joint_df[1,]
+add_rows$SampleID <- "Mock"
+add_rows$patient <-"mock"
 joint_df <- rbind(joint_df, add_rows)
 
-joint_df <- joint_df %>% filter(!SampleID %in% c("16316632", "16472795", "16415940", "16528868")) 
+#-------------------------- Remove missing samples
+joint_df <- joint_df %>% filter(!(SampleID %in% c("16316632", "16472795", "16528868")))
 
+# -------------- ---------- Check missing
+manifest_file <- read_csv("/media/harald/DATA/ht-18/2018-11-01_VERDI/data/metadata/manifest_file")
+
+man_names <- manifest_file$`sample-id` %>% unique()
+meta_names <- joint_df$SampleID
+
+man_names[which(!(man_names %in% meta_names))] # "16423996" Should be 16415940 
+meta_names[which(!(meta_names %in% man_names))] # "16316632", "16472795", "16528868" .... and "16415940"
+
+#------------------------- Write to file
 
 write_tsv(joint_df, path = "../../../data/metadata/metadata.tsv")
+
+
+# joint_df <- joint_df %>% filter(!SampleID %in% c("16316632", "16472795", "16415940", "16528868")) 
+# 
+# 
+# write_tsv(joint_df, path = "../../../data/metadata/metadata.tsv")
 
 # Remember to add # inront of first column name, can also use the google sheets plugin keemmei to validate the metadata-file

@@ -13,7 +13,8 @@ configfile: "verdi_config.yaml"
 rule all:
     input:
         directory("../../../data/processed/biom_table"),
-        directory("../../../data/processed/tree")
+        directory("../../../data/processed/tree")#,
+        #"../../../data/processed/biom_table/biom_table.txt"
 
 rule export_feature_table:
     input:
@@ -37,5 +38,3 @@ rule export_phylo_tree:
             "qiime tools export"
             " --input-path {input.un_rooted_tree}"
             " --output-path {output.nwk_tree}")
-
-# Write rule that downloads the sequences from qiime2 view and then use the python script to create a csv
